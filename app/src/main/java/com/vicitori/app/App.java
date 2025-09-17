@@ -1,4 +1,4 @@
-package main.java.com.vicitori;
+package main.java.com.vicitori.app;
 
 class App {
     public static void main(String[] argv) {
