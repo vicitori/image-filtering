@@ -1,4 +1,9 @@
-package main.java.com.vicitori.domain.convolution;
+package com.vicitori.domain.convolution;
 
-public class Convolution {
+import com.vicitori.domain.filters.FilterProfile;
+
+import java.awt.image.BufferedImage;
+
+public interface Convolution {
+    BufferedImage apply(BufferedImage image, FilterProfile filter);
 }
