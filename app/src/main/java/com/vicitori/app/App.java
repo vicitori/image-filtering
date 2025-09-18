@@ -41,10 +41,7 @@ public class App implements Callable<Integer> {
                     filterName, convMode == null ? "sequential" : convMode, savedPath);
             return 0;
         } catch (ImageProcessingException e) {
-            // uniform handling for user-facing CLI
             System.err.println("Error: " + e.getMessage());
-            // optionally print cause in debug mode:
-            // e.printStackTrace(System.err);
             return 1;
         }
     }
