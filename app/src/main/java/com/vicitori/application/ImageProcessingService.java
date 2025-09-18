@@ -1,11 +1,6 @@
 package com.vicitori.application;
 
-import com.vicitori.application.parallel.strategies.ColumnConvolution;
-import com.vicitori.application.parallel.strategies.GridConvolution;
-import com.vicitori.application.parallel.strategies.PixelConvolution;
-import com.vicitori.application.parallel.strategies.RowConvolution;
-import com.vicitori.domain.convolution.Convolution;
-import com.vicitori.domain.convolution.SequentialConvolution;
+import com.vicitori.domain.convolution.*;
 import com.vicitori.domain.filters.Filters;
 import com.vicitori.infrastructure.io.IOService;
 
@@ -19,6 +14,7 @@ public class ImageProcessingService {
     }
 
     public String process(String filterName, String convMode) throws ImageProcessingException {
+        System.out.println(filterName);
         try {
             float[][] kernel = Filters.get(filterName.toLowerCase());
             if (kernel == null) {
