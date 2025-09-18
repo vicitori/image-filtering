@@ -63,4 +63,7 @@ public class IOService {
         return name.substring(dot + 1);
     }
 
+    public Path getOutputPath() {
+        return outputPath.getFileName();
+    }
 }
