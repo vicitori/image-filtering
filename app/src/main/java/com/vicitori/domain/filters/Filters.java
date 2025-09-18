@@ -18,16 +18,16 @@ public class Filters {
             )
     );
 
-    public static FilterProfile getFilter(String name) {
+    public static FilterProfile get(String name) {
         return FILTERS.get(name.toLowerCase());
     }
 
     public static float[][] getKernel(String name) {
         FilterProfile filter = FILTERS.get(name.toLowerCase());
-        return filter != null ? filter.getKernel() : null;
+        return filter != null ? filter.kernel() : null;
     }
 
-    public static Set<String> getFilterNames() {
+    public static Set<String> getNames() {
         return FILTERS.keySet();
     }
 }

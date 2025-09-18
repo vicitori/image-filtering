@@ -1,6 +1,7 @@
 package com.vicitori.application;
 
 import com.vicitori.domain.convolution.*;
+import com.vicitori.domain.filters.FilterProfile;
 import com.vicitori.domain.filters.Filters;
 import com.vicitori.infrastructure.io.IOService;
 
@@ -16,13 +17,13 @@ public class ImageProcessingService {
     public String process(String filterName, String convMode) throws ImageProcessingException {
         System.out.println(filterName);
         try {
-            float[][] kernel = Filters.get(filterName.toLowerCase());
-            if (kernel == null) {
-                throw new ImageProcessingException("ImageProcessingService: process: Unknown filter: " + filterName + ". Available: " + Filters.names());
+            FilterProfile filter = Filters.get(filterName.toLowerCase());
+            if (filter == null) {
+                throw new ImageProcessingException("ImageProcessingService: process: Unknown filter: " + filterName + ". Available: " + Filters.getNames());
             }
             Convolution convolution = createConvolution(convMode);
             BufferedImage image = io.getImage();
-            BufferedImage result = convolution.apply(image, kernel);
+            BufferedImage result = convolution.apply(image, filter);
             io.writeImage(result);
             return io.getOutputPath().toString();
         } catch (Exception e) {
