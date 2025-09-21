@@ -27,15 +27,13 @@ public class RowConvolution extends AbstractConvolution implements Convolution {
             final int fy = y;
 
             tasks.add(() -> {
-                        for (int x = 0; x < width; x++) {
-                            Color newPixel = applyKernel(image, x, fy, filter);
-
-                            // memory areas of different threads do not overlap
-                            outputImage.setRGB(x, fy, newPixel.getRGB());
-                        }
-                        return null;
-                    }
-            );
+                for (int x = 0; x < width; x++) {
+                    Color newPixel = applyKernel(image, x, fy, filter);
+                    // memory areas of different threads do not overlap
+                    outputImage.setRGB(x, fy, newPixel.getRGB());
+                }
+                return null;
+            });
         }
 
         try {
