@@ -31,6 +31,7 @@ public class PixelConvolution extends AbstractConvolution implements Convolution
 
                 tasks.add(() -> {
                     Color newPixel = applyKernel(image, fx, fy, filter);
+                    // memory areas of different threads do not overlap
                     outputImage.setRGB(fx, fy, newPixel.getRGB());
                     return null;
                 });
