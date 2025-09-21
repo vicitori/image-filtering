@@ -1,59 +1,48 @@
-package com.vicitori.domain.convolution;
+package com.vicitori.core.conv;
 
-import com.vicitori.domain.filters.FilterProfile;
+import com.vicitori.core.AbstractConvolution;
+import com.vicitori.core.Convolution;
+import com.vicitori.core.Filter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class RowConvolution implements Convolution {
-    private float bias;
-    private float factor;
+public class RowConvolution extends AbstractConvolution implements Convolution {
+    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Override
-    public BufferedImage apply(BufferedImage image, FilterProfile filter) {
-        float[][] kernel = filter.kernel();
-        this.bias = filter.bias();
-        this.factor = filter.factor();
-
+    public BufferedImage apply(BufferedImage image, Filter filter) {
         int width = image.getWidth();
         int height = image.getHeight();
 
         BufferedImage outputImage = new BufferedImage(width, height, image.getType());
 
-        int filterHeight = kernel.length;
-        int filterWidth = kernel[0].length;
+        List<Callable<Void>> tasks = new ArrayList<>();
+        for (int y = 0; y < height; y++) {
+            final int fy = y;
 
-        int filterHalfH = filterHeight / 2;
-        int filterHalfW = filterWidth / 2;
+            tasks.add(() -> {
+                        for (int x = 0; x < width; x++) {
+                            Color newPixel = applyKernel(image, x, fy, filter);
 
-        IntStream.range(0, height).parallel().forEach(y -> {
-            for (int x = 0; x < width; x++) {
-                float red = 0, green = 0, blue = 0;
-                for (int filterY = 0; filterY < filterHeight; filterY++) {
-                    for (int filterX = 0; filterX < filterWidth; filterX++) {
-                        int imageX = (x - filterHalfW + filterX + width) % width;
-                        int imageY = (y - filterHalfH + filterY + height) % height;
-
-                        Color pixel = new Color(image.getRGB(imageX, imageY));
-
-                        red += pixel.getRed() * kernel[filterY][filterX];
-                        green += pixel.getGreen() * kernel[filterY][filterX];
-                        blue += pixel.getBlue() * kernel[filterY][filterX];
+                            // memory areas of different threads do not overlap
+                            outputImage.setRGB(x, fy, newPixel.getRGB());
+                        }
+                        return null;
                     }
-                }
-                Color newPixel = new Color(calibrate(red), calibrate(green), calibrate(blue));
-                synchronized (outputImage) {
-                    outputImage.setRGB(x, y, newPixel.getRGB());
-                }
-            }
-        });
-        return outputImage;
-    }
+            );
+        }
 
-    private int calibrate(float value) {
-        float newValue = value * factor + bias;
-        int intValue = Math.round(newValue);
-        return Math.max(0, Math.min(255, intValue));
+        try {
+            executor.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return outputImage;
     }
 }
