@@ -1,6 +1,7 @@
-package com.vicitori.domain.convolution;
+package com.vicitori.core.conv;
 
-import com.vicitori.domain.filters.FilterProfile;
+import com.vicitori.core.Convolution;
+import com.vicitori.core.Filter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,7 +11,7 @@ public class SequentialConvolution implements Convolution {
     private float factor;
 
     @Override
-    public BufferedImage apply(BufferedImage image, FilterProfile filter) {
+    public BufferedImage apply(BufferedImage image, Filter filter) {
         float[][] kernel = filter.kernel();
         this.bias = filter.bias();
         this.factor = filter.factor();
