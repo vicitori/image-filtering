@@ -1,19 +1,18 @@
-package com.vicitori.infrastructure.io;
+package com.vicitori.io;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class IOService {
+public class ImageIO {
 
     private final Path inputPath;
     private final Path outputPath;
     private final String outputFormat;
 
-    public IOService(String inputPathStr, String outputPathStr) {
+    public ImageIO(String inputPathStr, String outputPathStr) {
         if (inputPathStr == null) {
             throw new IllegalArgumentException("IOService: INPUT_PATH must not be null. Restart program.");
         }
@@ -42,7 +41,7 @@ public class IOService {
         if (!Files.isReadable(inputPath)) {
             throw new IOException("IOService: getImage: Input file is not readable: " + inputPath + ".");
         }
-        BufferedImage image = ImageIO.read(inputPath.toFile());
+        BufferedImage image = javax.imageio.ImageIO.read(inputPath.toFile());
         if (image == null) {
             throw new IOException("IOService: getImage: Could not read image (unsupported or corrupted): " + inputPath);
         }
@@ -50,7 +49,7 @@ public class IOService {
     }
 
     public void writeImage(BufferedImage image) throws IOException {
-        if (!ImageIO.write(image, outputFormat, outputPath.toFile())) {
+        if (!javax.imageio.ImageIO.write(image, outputFormat, outputPath.toFile())) {
             throw new IOException("IOService: writeImage: Failed to write image in format "
                     + outputFormat + " to path " + outputPath);
         }

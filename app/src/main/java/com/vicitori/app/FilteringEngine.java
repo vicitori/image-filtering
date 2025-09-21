@@ -1,25 +1,25 @@
-package com.vicitori.application;
+package com.vicitori.app;
 
-import com.vicitori.domain.convolution.*;
-import com.vicitori.domain.filters.FilterProfile;
-import com.vicitori.domain.filters.Filters;
-import com.vicitori.infrastructure.io.IOService;
+import com.vicitori.core.Convolution;
+import com.vicitori.core.Filter;
+import com.vicitori.core.conv.*;
+import com.vicitori.core.filters.FiltersLibrary;
+import com.vicitori.io.ImageIO;
 
 import java.awt.image.BufferedImage;
 
-public class ImageProcessingService {
-    private final IOService io;
+public class FilteringEngine {
+    private final ImageIO io;
 
-    public ImageProcessingService(IOService io) {
+    public FilteringEngine(ImageIO io) {
         this.io = io;
     }
 
-    public String process(String filterName, String convMode) throws ImageProcessingException {
-        System.out.println(filterName);
+    public String process(String filterName, String convMode) throws ProcessingException {
         try {
-            FilterProfile filter = Filters.get(filterName.toLowerCase());
+            Filter filter = FiltersLibrary.get(filterName.toLowerCase());
             if (filter == null) {
-                throw new ImageProcessingException("ImageProcessingService: process: Unknown filter: " + filterName + ". Available: " + Filters.getNames());
+                throw new ProcessingException("FilteringEngine: process: Unknown filter: " + filterName + ". Available: " + FiltersLibrary.getNames());
             }
             Convolution convolution = createConvolution(convMode);
             BufferedImage image = io.getImage();
@@ -27,7 +27,7 @@ public class ImageProcessingService {
             io.writeImage(result);
             return io.getOutputPath().toString();
         } catch (Exception e) {
-            throw new ImageProcessingException("Processing failed: " + e.getMessage());
+            throw new ProcessingException("FilteringEngine: process: " + e.getMessage());
         }
     }
 

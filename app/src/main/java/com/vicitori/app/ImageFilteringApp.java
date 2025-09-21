@@ -1,8 +1,6 @@
 package com.vicitori.app;
 
-import com.vicitori.application.ImageProcessingException;
-import com.vicitori.application.ImageProcessingService;
-import com.vicitori.infrastructure.io.IOService;
+import com.vicitori.io.ImageIO;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -13,7 +11,7 @@ import java.util.concurrent.Callable;
         description = "Apply convolution filters to an image.",
         mixinStandardHelpOptions = true
 )
-public class App implements Callable<Integer> {
+public class ImageFilteringApp implements Callable<Integer> {
 
     @Parameters(index = "0", description = "Path to the input image.", paramLabel = "INPUT_PATH")
     private String inputPath;
@@ -32,15 +30,15 @@ public class App implements Callable<Integer> {
     private String outputPath;
 
     @Override
-    public Integer call() throws ImageProcessingException {
-        IOService io = new IOService(inputPath, outputPath);
-        ImageProcessingService imgProcessor = new ImageProcessingService(io);
+    public Integer call() throws ProcessingException {
+        ImageIO io = new ImageIO(inputPath, outputPath);
+        FilteringEngine imgProcessor = new FilteringEngine(io);
         try {
             String savedPath = imgProcessor.process(filterName, convMode);
             System.out.printf("Applied filter '%s' with mode '%s'. Saved result to %s%n",
                     filterName, convMode == null ? "sequential" : convMode, savedPath);
             return 0;
-        } catch (ImageProcessingException e) {
+        } catch (ProcessingException e) {
             System.err.println("Error: " + e.getMessage());
             return 1;
         }
