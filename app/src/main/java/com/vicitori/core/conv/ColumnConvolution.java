@@ -1,13 +1,45 @@
 package com.vicitori.core.conv;
 
+import com.vicitori.core.AbstractConvolution;
 import com.vicitori.core.Convolution;
 import com.vicitori.core.Filter;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class ColumnConvolution implements Convolution {
+public class ColumnConvolution extends AbstractConvolution implements Convolution {
+    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
     @Override
-    public BufferedImage apply(BufferedImage input, Filter filter) {
-        throw new UnsupportedOperationException("Sequential convolution not implemented yet.");
+    public BufferedImage apply(BufferedImage image, Filter filter) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        BufferedImage outputImage = new BufferedImage(width, height, image.getType());
+
+        List<Callable<Void>> tasks = new ArrayList<>();
+        for (int x = 0; x < width; x++) {
+            final int fx = x;
+            tasks.add(() -> {
+                for (int y = 0; y < height; y++) {
+                    Color newPixel = applyKernel(image, fx, y, filter);
+                    // memory areas of different threads do not overlap
+                    outputImage.setRGB(fx, y, newPixel.getRGB());
+                }
+                return null;
+            });
+        }
+
+        try {
+            executor.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return outputImage;
     }
 }
