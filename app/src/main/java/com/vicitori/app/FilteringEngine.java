@@ -8,12 +8,13 @@ import com.vicitori.io.ImageIO;
 import com.vicitori.pipeline.ImagePipeline;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 public class FilteringEngine {
     private final ImageIO io;
 
     public FilteringEngine(ImageIO io) {
-        this.io = io;
+        this.io = Objects.requireNonNull(io, "ImageIO cannot be null");
     }
 
     public String process(String filterName, String convMode) throws ProcessingException {

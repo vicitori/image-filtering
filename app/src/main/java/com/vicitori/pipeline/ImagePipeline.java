@@ -23,7 +23,8 @@ public class ImagePipeline {
     private record Result(BufferedImage image, String name) {}
 
     public ImagePipeline(List<File> inputFiles, File outputDir, int workersCount, Convolution convolution, Filter filter) {
-        this.inputFiles = inputFiles;
+        // defensive copy to prevent external modification
+        this.inputFiles = List.copyOf(inputFiles);
         this.outputDir = outputDir;
         this.workersCount = workersCount;
         this.convolution = convolution;

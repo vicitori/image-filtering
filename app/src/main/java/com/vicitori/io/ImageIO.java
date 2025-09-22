@@ -17,32 +17,39 @@ public class ImageIO {
     public final List<File> inputFiles;
     public final File outputDir;
 
-    public ImageIO(boolean isDirectory, String inputPathStr, String outputPathStr) {
+    private ImageIO(Path inputPath, Path outputPath, String outputFormat, List<File> inputFiles, File outputDir) {
+        this.inputPath = inputPath;
+        this.outputPath = outputPath;
+        this.outputFormat = outputFormat;
+        this.inputFiles = inputFiles;
+        this.outputDir = outputDir;
+    }
+    
+    public static ImageIO create(boolean isDirectory, String inputPathStr, String outputPathStr) {
         if (inputPathStr == null) {
             throw new IllegalArgumentException("IOService: INPUT_PATH must not be null. Restart program.");
         }
-
-        if (isDirectory) {
-            File inputDir = validateInputDir(inputPathStr);
-            this.inputFiles = collectInputFiles(inputDir);
-
-            this.outputDir = prepareOutputDir(inputDir, outputPathStr);
-            this.outputFormat = detectOutputFormat(this.inputFiles);
-
-            this.inputPath = null;
-            this.outputPath = null;
-        } else {
-            this.inputPath = Paths.get(inputPathStr);
-            PathAndFormat out = resolveOutputPathAndFormat(inputPathStr, outputPathStr, this.inputPath);
-            this.outputPath = out.path();
-            this.outputFormat = out.format();
-
-            this.inputFiles = null;
-            this.outputDir = null;
+        
+        try {
+            if (isDirectory) {
+                File inputDir = validateInputDir(inputPathStr);
+                List<File> inputFiles = collectInputFiles(inputDir);
+                File outputDir = prepareOutputDir(inputDir, outputPathStr);
+                String outputFormat = detectOutputFormat(inputFiles);
+                
+                return new ImageIO(null, null, outputFormat, inputFiles, outputDir);
+            } else {
+                Path inputPath = Paths.get(inputPathStr);
+                PathAndFormat out = resolveOutputPathAndFormat(inputPathStr, outputPathStr, inputPath);
+                
+                return new ImageIO(inputPath, out.path(), out.format(), null, null);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create ImageIO", e);
         }
     }
 
-    private File validateInputDir(String inputPathStr) {
+    private static File validateInputDir(String inputPathStr) {
         File inputDir = new File(inputPathStr);
         if (!inputDir.exists() || !inputDir.isDirectory()) {
             throw new IllegalArgumentException("Error: " + inputPathStr + " is not a valid directory.");
@@ -51,7 +58,7 @@ public class ImageIO {
     }
 
 
-    private List<File> collectInputFiles(File inputDir) {
+    private static List<File> collectInputFiles(File inputDir) {
         List<File> inputFiles = Arrays.stream(Objects.requireNonNull(inputDir.listFiles()))
                 .filter(File::isFile)
                 .filter(f -> {
@@ -66,7 +73,7 @@ public class ImageIO {
     }
 
 
-    private File prepareOutputDir(File inputDir, String outputPathStr) {
+    private static File prepareOutputDir(File inputDir, String outputPathStr) {
         File outputDir = (outputPathStr == null)
                 ? new File(inputDir.getParentFile(), inputDir.getName() + "_filtered")
                 : new File(outputPathStr);
@@ -80,14 +87,14 @@ public class ImageIO {
         return outputDir;
     }
 
-    private String detectOutputFormat(List<File> inputFiles) {
+    private static String detectOutputFormat(List<File> inputFiles) {
         String firstExt = extensionOfFileName(inputFiles.getFirst().getName());
         return (firstExt == null) ? "png" : firstExt.toLowerCase();
     }
 
     private record PathAndFormat(Path path, String format) {}
 
-    private PathAndFormat resolveOutputPathAndFormat(String inputPathStr, String outputPathStr, Path inputPath) {
+    private static PathAndFormat resolveOutputPathAndFormat(String inputPathStr, String outputPathStr, Path inputPath) {
         if (outputPathStr == null) {
             String ext = extensionOfFileName(inputPathStr);
             String format = (ext == null) ? "png" : ext.toLowerCase();
