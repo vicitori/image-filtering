@@ -1,0 +1,93 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, work ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        
+    - name: Run tests
+      run: ./gradlew test
+      
+    - name: Run SpotBugs
+      run: ./gradlew spotbugsMain
+      
+    - name: Build
+      run: ./gradlew build
+      
+    - name: Create fat JAR
+      run: ./gradlew fatJar
+      
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: image-filtering-app
+        path: app/build/libs/image-filtering-all.jar
+        retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        
+    - name: Build and create fat JAR
+      run: ./gradlew fatJar
+      
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Image Filtering App v${{ github.run_number }}
+        body: |
+          ## Image Filtering Application
+          
+          Automated build from commit ${{ github.sha }}
+          
+          ## Usage
+          ```bash
+          java -jar image-filtering-all.jar <input_path> <filter_name> [convolution_mode] [output_path]
+          ```
+          
+          ## Available Filters
+          - blur
+          - emboss
+          - find_edges
+          - glass_distortion
+          - motion_blur
+          - negative
+          - pixelate
+          - radial_blur
+          
+          ## Convolution Modes
+          - sequential (default)
+          - row
+          - column
+          - pixel
+          - grid
+        files: app/build/libs/image-filtering-all.jar
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
