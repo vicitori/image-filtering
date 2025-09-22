@@ -53,11 +53,6 @@ public class FiltersLibrary {
         return FILTERS.get(name.toLowerCase());
     }
 
-    public static float[][] getKernel(String name) {
-        Filter filter = FILTERS.get(name.toLowerCase());
-        return filter != null ? filter.kernel() : null;
-    }
-
     public static Set<String> getNames() {
         return FILTERS.keySet();
     }
