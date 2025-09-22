@@ -68,7 +68,7 @@ public class ImagePipeline {
         for (int i = 0; i < workersCount; i++) {
             pool.submit(() -> {
                 try {
-                    while (true) {
+                    while (!Thread.currentThread().isInterrupted()) {
                         File file = readQueue.take();
                         if (file == POISON_FILE) {
                             readQueue.put(file);
@@ -78,6 +78,8 @@ public class ImagePipeline {
                         BufferedImage result = convolution.apply(img, filter);
                         writeQueue.put(new Result(result, file.getName()));
                     }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 } catch (Exception e) {
                     System.err.println("Error: ImagePipeline: createWorkers: " + e.getMessage());
                 }
@@ -89,13 +91,14 @@ public class ImagePipeline {
     private Thread createWriter() {
         return new Thread(() -> {
             try {
-                // for future: add to ImageIO
-                while (true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     Result res = writeQueue.take();
                     if (res.image == null) break;
                     File outputFile = new File(outputDir, "filtered_" + res.name);
                     ImageIO.write(res.image, "png", outputFile);
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 System.err.println("Error: ImagePipeline: createWriter: " + e.getMessage());
             }
