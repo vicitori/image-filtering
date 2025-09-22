@@ -38,7 +38,7 @@ public class ImageFilteringApp implements Callable<Integer> {
     @Override
     public Integer call() {
         try {
-            ImageIO io = new ImageIO(directoryMode, inputPath, outputPath);
+            ImageIO io = ImageIO.create(directoryMode, inputPath, outputPath);
             FilteringEngine imgProcessor = new FilteringEngine(io);
             String savedPath;
             if (directoryMode) {
