@@ -3,7 +3,7 @@ package com.vicitori.app;
 import com.vicitori.io.ImageIO;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
-
+import picocli.CommandLine.Option;
 import java.util.concurrent.Callable;
 
 @Command(
@@ -29,12 +29,23 @@ public class ImageFilteringApp implements Callable<Integer> {
             paramLabel = "OUTPUT_PATH")
     private String outputPath;
 
+    @Option(names = {"-d", "--dir"}, description = "If specified, treat INPUT_PATH as a directory and process all images inside.")
+    private boolean directoryMode = false;
+
+    @Option(names = {"-t", "--threads"}, description = "Number of worker threads for directory processing. Default: 4")
+    private int workers = 4;
+
     @Override
-    public Integer call() throws ProcessingException {
-        ImageIO io = new ImageIO(inputPath, outputPath);
-        FilteringEngine imgProcessor = new FilteringEngine(io);
+    public Integer call() {
         try {
-            String savedPath = imgProcessor.process(filterName, convMode);
+            ImageIO io = new ImageIO(directoryMode, inputPath, outputPath);
+            FilteringEngine imgProcessor = new FilteringEngine(io);
+            String savedPath;
+            if (directoryMode) {
+                savedPath = imgProcessor.process(filterName, convMode, workers);
+            } else {
+                savedPath = imgProcessor.process(filterName, convMode);
+            }
             System.out.printf("Applied filter '%s' with mode '%s'. Saved result to %s%n",
                     filterName, convMode == null ? "sequential" : convMode, savedPath);
             return 0;
