@@ -29,7 +29,7 @@ public class ImageFilteringApp implements Callable<Integer> {
             paramLabel = "OUTPUT_PATH")
     private String outputPath;
 
-    @Option(names = {"-d", "--dir"}, description = "If specified, treat INPUT_PATH as a directory and process all images inside.")
+    @Option(names = {"-d", "--directory"}, description = "If specified, treat INPUT_PATH as a directory and process all images inside.")
     private boolean directoryMode = false;
 
     @Option(names = {"-t", "--threads"}, description = "Number of worker threads for directory processing. Default: 4")
