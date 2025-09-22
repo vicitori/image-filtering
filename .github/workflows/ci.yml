@@ -7,96 +7,87 @@ on:
     branches: [ main ]
 
 jobs:
-  test-and-lint:
+  build:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v3
       
-    - name: Set up JDK 23
-      uses: actions/setup-java@v4
+    - name: Setup Java
+      uses: actions/setup-java@v3
       with:
-        distribution: temurin
-        java-version: 23
+        java-version: '21'
+        distribution: 'temurin'
         
-    - name: Cache Gradle dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
     - name: Run tests
       run: ./gradlew test
       
-    - name: Generate test report
-      uses: dorny/test-reporter@v1
-      if: success() || failure()
-      with:
-        name: Gradle Tests
-        path: app/build/test-results/test/TEST-*.xml
-        reporter: java-junit
-
-  build-and-release:
-    needs: test-and-lint
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: Run SpotBugs
+      run: ./gradlew spotbugsMain
       
-    - name: Set up JDK 23
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: 23
-        
-    - name: Cache Gradle dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Build application
-      run: ./gradlew clean build
+    - name: Build
+      run: ./gradlew build
       
     - name: Create fat JAR
       run: ./gradlew fatJar
       
-    - name: Upload build artifacts
+    - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
         name: image-filtering-app
-        path: app/build/libs/app-all.jar
+        path: app/build/libs/image-filtering-all.jar
         retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
         
+    - name: Build and create fat JAR
+      run: ./gradlew fatJar
+      
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: pr-${{ github.event.number }}-${{ github.sha }}
-        name: PR #${{ github.event.number }} - Image Filtering App
+        tag_name: v${{ github.run_number }}
+        name: Image Filtering App v${{ github.run_number }}
         body: |
-          ## Changes in this PR
-          ${{ github.event.pull_request.body }}
+          ## Image Filtering Application
           
-          ## Build Artifacts
-          - `app-all.jar` - Executable JAR file
+          Automated build from commit ${{ github.sha }}
           
           ## Usage
           ```bash
-          java -jar app-all.jar <input_path> <filter_name> [convolution_mode] [output_path]
+          java -jar image-filtering-all.jar <input_path> <filter_name> [convolution_mode] [output_path]
           ```
-        files: app/build/libs/app-all.jar
+          
+          ## Available Filters
+          - blur
+          - emboss
+          - find_edges
+          - glass_distortion
+          - motion_blur
+          - negative
+          - pixelate
+          - radial_blur
+          
+          ## Convolution Modes
+          - sequential (default)
+          - row
+          - column
+          - pixel
+          - grid
+        files: app/build/libs/image-filtering-all.jar
         draft: false
-        prerelease: true
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
