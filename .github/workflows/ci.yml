@@ -1,4 +1,4 @@
-name: Image filtering CI + release
+name: CI/CD Pipeline
 
 on:
   push:
@@ -7,87 +7,96 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test-and-lint:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 23
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 23
+        
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Run tests
+      run: ./gradlew test
+      
+    - name: Generate test report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Gradle Tests
+        path: app/build/test-results/test/TEST-*.xml
+        reporter: java-junit
 
-      - name: Set up JDK 23
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 23
-
-      - name: Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-
-      - name: Build and run tests
-        run: ./gradlew clean build
-
-      - name: Run Checkstyle
-        run: ./gradlew checkstyleMain || true
-
-  pr-artifact:
-    needs: build
+  build-and-release:
+    needs: test-and-lint
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 23
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 23
-
-      - name: Build fat JAR
-        run: ./gradlew clean fatJar
-
-      - name: Upload JAR as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: pr-fat-jar
-          path: build/libs/app-all.jar
-
-  release:
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 23
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 23
-
-      - name: Build fat JAR
-        run: ./gradlew clean fatJar
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ github.run_number }}-main
-          name: Release ${{ github.run_number }}
-          body: "Auto-generated release for run #${{ github.run_number }}"
-
-      - name: Upload JAR to release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: app/build/libs/app-all.jar
-          asset_name: filtering.jar
-          asset_content_type: application/java-archive
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 23
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 23
+        
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Build application
+      run: ./gradlew clean build
+      
+    - name: Create fat JAR
+      run: ./gradlew fatJar
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: image-filtering-app
+        path: app/build/libs/app-all.jar
+        retention-days: 30
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: pr-${{ github.event.number }}-${{ github.sha }}
+        name: PR #${{ github.event.number }} - Image Filtering App
+        body: |
+          ## Changes in this PR
+          ${{ github.event.pull_request.body }}
+          
+          ## Build Artifacts
+          - `app-all.jar` - Executable JAR file
+          
+          ## Usage
+          ```bash
+          java -jar app-all.jar <input_path> <filter_name> [convolution_mode] [output_path]
+          ```
+        files: app/build/libs/app-all.jar
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
