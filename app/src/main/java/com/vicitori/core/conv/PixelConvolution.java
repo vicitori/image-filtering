@@ -46,5 +46,3 @@ public class PixelConvolution extends AbstractConvolution implements Convolution
         return outputImage;
     }
 }
-
-
