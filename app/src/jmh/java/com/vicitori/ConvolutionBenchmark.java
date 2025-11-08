@@ -21,6 +21,7 @@ public class ConvolutionBenchmark {
 
     private BufferedImage testImage;
     private Filter blurFilter;
+    private Random rand;
 
     @Param({"1", "2", "4", "8", "16", "32"}) // Example values, can be adjusted
     public int blocksCntX;
@@ -32,6 +33,7 @@ public class ConvolutionBenchmark {
     public void setUp() {
         testImage = createTestImage(8000, 8000); // Larger image for benchmarking
         blurFilter = FiltersLibrary.get("blur");
+        rand = new Random(42);
     }
 
     @Benchmark
@@ -66,7 +68,6 @@ public class ConvolutionBenchmark {
 
     private BufferedImage createTestImage(int width, int height) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Random rand = new Random(42);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 image.setRGB(x, y, rand.nextInt());
