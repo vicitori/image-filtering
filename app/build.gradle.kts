@@ -33,12 +33,8 @@ jmh {
     iterations = 5
     timeUnit = "ms"
     resultFormat = "JSON"
-    resultsFile = project.file("app/src/jmh/java/com/vicitori/results.json")
+    resultsFile = project.file("src/jmh/java/com/vicitori/results.json")
 }
-
-// tasks.named<me.champeau.jmh.JMHTask>("jmh") {
-//     classpath(configurations.jmhRuntimeClasspath)
-// }
 
 java {
     toolchain {

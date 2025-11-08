@@ -17,13 +17,13 @@ public class FilteringEngine {
         this.io = Objects.requireNonNull(io, "ImageIO cannot be null");
     }
 
-    public String process(String filterName, String convMode) throws ProcessingException {
+    public String process(String filterName, String convMode, int blocksCntX, int blocksCntY) throws ProcessingException {
         try {
             Filter filter = FiltersLibrary.get(filterName.toLowerCase());
             if (filter == null) {
                 throw new ProcessingException("FilteringEngine: process: Unknown filter: " + filterName + ". Available: " + FiltersLibrary.getNames());
             }
-            Convolution convolution = createConvolution(convMode);
+            Convolution convolution = createConvolution(convMode, blocksCntX, blocksCntY);
             BufferedImage image = io.getImage();
             BufferedImage result = convolution.apply(image, filter);
             io.writeImage(result);
@@ -33,13 +33,13 @@ public class FilteringEngine {
         }
     }
 
-    public String process(String filterName, String convMode, int workers) throws ProcessingException {
+    public String process(String filterName, String convMode, int workers, int blocksCntX, int blocksCntY) throws ProcessingException {
         try {
             Filter filter = FiltersLibrary.get(filterName.toLowerCase());
             if (filter == null) {
                 throw new ProcessingException("FilteringEngine: process: with workers: Unknown filter: " + filterName + ". Available: " + FiltersLibrary.getNames());
             }
-            Convolution convolution = createConvolution(convMode);
+            Convolution convolution = createConvolution(convMode, blocksCntX, blocksCntY);
             new ImagePipeline(io.getInputFiles(), io.getOutputDir(), workers, convolution, filter).start();
             return io.getOutputDir().toString();
         } catch (Exception e) {
@@ -47,13 +47,13 @@ public class FilteringEngine {
         }
     }
 
-    private Convolution createConvolution(String convMode) {
+    private Convolution createConvolution(String convMode, int blocksCntX, int blocksCntY) {
         if (convMode == null) return new SequentialConvolution();
         return switch (convMode.toLowerCase()) {
             case "row" -> new RowConvolution();
             case "column" -> new ColumnConvolution();
             case "pixel" -> new PixelConvolution();
-            case "grid" -> new GridConvolution();
+            case "grid" -> new GridConvolution(blocksCntX, blocksCntY);
             default -> new SequentialConvolution();
         };
     }

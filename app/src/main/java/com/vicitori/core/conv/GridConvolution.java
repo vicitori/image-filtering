@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 
 public class GridConvolution extends AbstractConvolution implements Convolution {
     private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    // in the future it will be possible to set via cli
     private final int blocksCntX;
     private final int blocksCntY;
 
@@ -25,8 +24,7 @@ public class GridConvolution extends AbstractConvolution implements Convolution 
 
     // now uses these randomly selected values
     public GridConvolution() {
-        this.blocksCntX = 10;
-        this.blocksCntY = 6;
+        this(10, 6);
     }
 
     @Override

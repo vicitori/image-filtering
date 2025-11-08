@@ -35,6 +35,12 @@ public class ImageFilteringApp implements Callable<Integer> {
     @Option(names = {"-t", "--threads"}, description = "Number of worker threads for directory processing. Default: 4")
     private int workers = 4;
 
+    @Option(names = {"-x", "--blocksX"}, description = "Number of blocks along the X-axis for grid convolution. Default: 10")
+    private int blocksCntX = 10;
+
+    @Option(names = {"-y", "--blocksY"}, description = "Number of blocks along the Y-axis for grid convolution. Default: 6")
+    private int blocksCntY = 6;
+
     @Override
     public Integer call() {
         try {
@@ -42,9 +48,9 @@ public class ImageFilteringApp implements Callable<Integer> {
             FilteringEngine imgProcessor = new FilteringEngine(io);
             String savedPath;
             if (directoryMode) {
-                savedPath = imgProcessor.process(filterName, convMode, workers);
+                savedPath = imgProcessor.process(filterName, convMode, workers, blocksCntX, blocksCntY);
             } else {
-                savedPath = imgProcessor.process(filterName, convMode);
+                savedPath = imgProcessor.process(filterName, convMode, blocksCntX, blocksCntY);
             }
             System.out.printf("Applied filter '%s' with mode '%s'. Saved result to %s%n",
                     filterName, convMode == null ? "sequential" : convMode, savedPath);

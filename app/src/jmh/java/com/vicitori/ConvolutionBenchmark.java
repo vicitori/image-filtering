@@ -22,6 +22,12 @@ public class ConvolutionBenchmark {
     private BufferedImage testImage;
     private Filter blurFilter;
 
+    @Param({"1", "2", "4", "8", "16", "32"}) // Example values, can be adjusted
+    public int blocksCntX;
+
+    @Param({"1", "2", "4", "8", "16", "32"}) // Example values, can be adjusted
+    public int blocksCntY;
+
     @Setup(Level.Trial)
     public void setUp() {
         testImage = createTestImage(8000, 8000); // Larger image for benchmarking
@@ -48,7 +54,7 @@ public class ConvolutionBenchmark {
 
     @Benchmark
     public void gridConvolution() {
-        Convolution conv = new GridConvolution();
+        Convolution conv = new GridConvolution(blocksCntX, blocksCntY);
         conv.apply(testImage, blurFilter);
     }
 
