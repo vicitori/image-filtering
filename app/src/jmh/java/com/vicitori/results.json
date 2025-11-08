@@ -1,0 +1,228 @@
+[
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "com.vicitori.ConvolutionBenchmark.columnConvolution",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/Users/vicat/Library/Java/JavaVirtualMachines/ms-21.0.7/Contents/Home/bin/java",
+        "jvmArgs" : [
+            "-Dfile.encoding=UTF-8",
+            "-Djava.io.tmpdir=/Users/vicat/Study/uni/fourth/image-filtering/app/build/tmp/jmh",
+            "-Duser.country=GB",
+            "-Duser.language=en",
+            "-Duser.variant"
+        ],
+        "jdkVersion" : "21.0.7",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "21.0.7+6-LTS",
+        "warmupIterations" : 2,
+        "warmupTime" : "5 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 5,
+        "measurementTime" : "5 s",
+        "measurementBatchSize" : 1,
+        "primaryMetric" : {
+            "score" : 8577.579633000001,
+            "scoreError" : 9713.785068770525,
+            "scoreConfidence" : [
+                -1136.2054357705238,
+                18291.364701770526
+            ],
+            "scorePercentiles" : {
+                "0.0" : 6510.118583,
+                "50.0" : 7568.787583,
+                "90.0" : 12565.558291,
+                "95.0" : 12565.558291,
+                "99.0" : 12565.558291,
+                "99.9" : 12565.558291,
+                "99.99" : 12565.558291,
+                "99.999" : 12565.558291,
+                "99.9999" : 12565.558291,
+                "100.0" : 12565.558291
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    12565.558291,
+                    9507.93125,
+                    7568.787583,
+                    6510.118583,
+                    6735.502458
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "com.vicitori.ConvolutionBenchmark.gridConvolution",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/Users/vicat/Library/Java/JavaVirtualMachines/ms-21.0.7/Contents/Home/bin/java",
+        "jvmArgs" : [
+            "-Dfile.encoding=UTF-8",
+            "-Djava.io.tmpdir=/Users/vicat/Study/uni/fourth/image-filtering/app/build/tmp/jmh",
+            "-Duser.country=GB",
+            "-Duser.language=en",
+            "-Duser.variant"
+        ],
+        "jdkVersion" : "21.0.7",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "21.0.7+6-LTS",
+        "warmupIterations" : 2,
+        "warmupTime" : "5 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 5,
+        "measurementTime" : "5 s",
+        "measurementBatchSize" : 1,
+        "primaryMetric" : {
+            "score" : 5610.404708399999,
+            "scoreError" : 581.7654256862971,
+            "scoreConfidence" : [
+                5028.639282713702,
+                6192.1701340862965
+            ],
+            "scorePercentiles" : {
+                "0.0" : 5480.827917,
+                "50.0" : 5599.654875,
+                "90.0" : 5862.868125,
+                "95.0" : 5862.868125,
+                "99.0" : 5862.868125,
+                "99.9" : 5862.868125,
+                "99.99" : 5862.868125,
+                "99.999" : 5862.868125,
+                "99.9999" : 5862.868125,
+                "100.0" : 5862.868125
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    5862.868125,
+                    5507.576083,
+                    5601.096542,
+                    5480.827917,
+                    5599.654875
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "com.vicitori.ConvolutionBenchmark.rowConvolution",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/Users/vicat/Library/Java/JavaVirtualMachines/ms-21.0.7/Contents/Home/bin/java",
+        "jvmArgs" : [
+            "-Dfile.encoding=UTF-8",
+            "-Djava.io.tmpdir=/Users/vicat/Study/uni/fourth/image-filtering/app/build/tmp/jmh",
+            "-Duser.country=GB",
+            "-Duser.language=en",
+            "-Duser.variant"
+        ],
+        "jdkVersion" : "21.0.7",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "21.0.7+6-LTS",
+        "warmupIterations" : 2,
+        "warmupTime" : "5 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 5,
+        "measurementTime" : "5 s",
+        "measurementBatchSize" : 1,
+        "primaryMetric" : {
+            "score" : 5329.240258399999,
+            "scoreError" : 589.1276456083143,
+            "scoreConfidence" : [
+                4740.112612791685,
+                5918.367904008313
+            ],
+            "scorePercentiles" : {
+                "0.0" : 5096.574458,
+                "50.0" : 5322.865209,
+                "90.0" : 5515.182792,
+                "95.0" : 5515.182792,
+                "99.0" : 5515.182792,
+                "99.9" : 5515.182792,
+                "99.99" : 5515.182792,
+                "99.999" : 5515.182792,
+                "99.9999" : 5515.182792,
+                "100.0" : 5515.182792
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    5397.448792,
+                    5314.130041,
+                    5096.574458,
+                    5322.865209,
+                    5515.182792
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "com.vicitori.ConvolutionBenchmark.sequentialConvolution",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/Users/vicat/Library/Java/JavaVirtualMachines/ms-21.0.7/Contents/Home/bin/java",
+        "jvmArgs" : [
+            "-Dfile.encoding=UTF-8",
+            "-Djava.io.tmpdir=/Users/vicat/Study/uni/fourth/image-filtering/app/build/tmp/jmh",
+            "-Duser.country=GB",
+            "-Duser.language=en",
+            "-Duser.variant"
+        ],
+        "jdkVersion" : "21.0.7",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "21.0.7+6-LTS",
+        "warmupIterations" : 2,
+        "warmupTime" : "5 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 5,
+        "measurementTime" : "5 s",
+        "measurementBatchSize" : 1,
+        "primaryMetric" : {
+            "score" : 25006.9413,
+            "scoreError" : 1621.450965984218,
+            "scoreConfidence" : [
+                23385.49033401578,
+                26628.392265984217
+            ],
+            "scorePercentiles" : {
+                "0.0" : 24383.042166,
+                "50.0" : 25035.999458,
+                "90.0" : 25525.185292,
+                "95.0" : 25525.185292,
+                "99.0" : 25525.185292,
+                "99.9" : 25525.185292,
+                "99.99" : 25525.185292,
+                "99.999" : 25525.185292,
+                "99.9999" : 25525.185292,
+                "100.0" : 25525.185292
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    24383.042166,
+                    24890.890084,
+                    25525.185292,
+                    25035.999458,
+                    25199.5895
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    }
+]
+
+

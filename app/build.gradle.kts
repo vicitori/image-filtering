@@ -1,8 +1,10 @@
 import org.gradle.internal.classpath.Instrumented.systemProperty
 
 plugins {
+    java
     application
-    id("com.github.spotbugs") version "6.0.14"
+    id("com.github.spotbugs") version "6.0.17"
+    id("me.champeau.jmh") version "0.7.3"
 }
 
 repositories {
@@ -18,7 +20,25 @@ dependencies {
     // JUnit for testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // JMH for benchmarking
+    jmhImplementation("org.openjdk.jmh:jmh-core:1.37")
+    jmhAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
 }
+
+jmh {
+    jmhVersion = "1.37"
+    fork = 1
+    warmupIterations = 2
+    iterations = 5
+    timeUnit = "ms"
+    resultFormat = "JSON"
+    resultsFile = project.file("app/src/jmh/java/com/vicitori/results.json")
+}
+
+// tasks.named<me.champeau.jmh.JMHTask>("jmh") {
+//     classpath(configurations.jmhRuntimeClasspath)
+// }
 
 java {
     toolchain {
@@ -50,5 +70,3 @@ tasks.register<Jar>("fatJar") {
 spotbugs {
     ignoreFailures = false
 }
-
-
