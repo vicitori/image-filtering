@@ -66,3 +66,7 @@ tasks.register<Jar>("fatJar") {
 spotbugs {
     ignoreFailures = false
 }
+
+tasks.named<com.github.spotbugs.snom.SpotBugsTask>("spotbugsJmh") {
+    excludeFilter.set(file("spotbugs-exclude.xml"))
+}
